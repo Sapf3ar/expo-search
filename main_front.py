@@ -188,7 +188,6 @@ with col_input2:
     if st.button(welcome_string, key='api_call', on_click=call_api_callback, disabled=not condition) and st.session_state.front_image :
         image_path = st.session_state.front_image 
         logging.warning(image_path)
-        # encoded = encode_image(image_path)
         # CALL VLLM
         descriptions =list(map(str,  st.session_state.objects_found.description.values[:10]))
         try:
