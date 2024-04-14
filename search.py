@@ -5,9 +5,15 @@ import transformers
 import pandas as pd 
 import uuid
 import sys
-
+from transformers import AutoModel
+import time
 def get_group(result_df: pd.DataFrame) -> str:
     return result_df['group'].mode().values[0]
+
+def model_load():
+    model = AutoModel.from_pretrained("clip/")
+
+    return model
 
 def append_to_faiss_index(
         test_df, 
@@ -16,16 +22,17 @@ def append_to_faiss_index(
         name, 
         group, 
         processor,
+        model, 
         description=None, 
         object_id=None, 
         img_name=None):
-    
+    start = time.time()
     # for pandas
     object_id = object_id if object_id else str(uuid.uuid4())
     img_name = img_name if img_name else str(uuid.uuid4())
     
     row = pd.DataFrame({'object_id': [object_id], 'name': [name], 'group': [group],
-                        'description': [description], 'img_name': [img_name]})
+                        'description': [description], 'img_name': [img_name.split("/")[-1]]})
     
     test_df = pd.concat([test_df, row], ignore_index=True)
     
@@ -38,9 +45,11 @@ def append_to_faiss_index(
     )
     img_embedding = np.array([img_embedding])
     faiss_index.add(img_embedding)
-    
-    
-    return test_df, faiss_index
+    test_df.to_csv('data/test.csv')
+    faiss.write_index(faiss_index, "data/faiss.index")
+    end = time.time()
+
+    return end - start 
     
 
 

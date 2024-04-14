@@ -1,5 +1,6 @@
-[server]
-headless = true
-
-[browser]
-serverAddress = “www.hack.expo-search-dp.com”
+[theme]
+primaryColor = "#f63366"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
