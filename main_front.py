@@ -8,7 +8,8 @@ import logging
 import os
 import torch
 import pandas as pd
-from api.api import call_vision_api, encode_image
+# IMPORT VLLM
+from ml.call_vllm import call_vision_api
 import time
 
 from transformers import AutoImageProcessor, AutoModel
@@ -156,10 +157,12 @@ with col_input2:
     if st.button(welcome_string, key='api_call', on_click=call_api_callback, disabled=condition) and st.session_state.front_image :
         image_path = st.session_state.front_image 
         logging.warning(image_path)
-        encoded = encode_image(image_path)
+        # encoded = encode_image(image_path)
+        # CALL VLLM
         descriptions =list(map(str,  st.session_state.objects_found.description.values[:10]))
         try:
-            output_text = call_vision_api(img_base64=encoded , descriptions=descriptions)
+            output_text = call_vision_api(descriptions=descriptions, image=Image.open(image_path))
+            
         except Exception as e:
             logging.warning(e)
             time.sleep(1)
