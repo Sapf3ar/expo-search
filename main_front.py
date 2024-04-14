@@ -11,6 +11,8 @@ import pandas as pd
 # IMPORT VLLM
 from ml.call_vllm import call_vision_api
 import time
+import h5py
+import numpy as np
 
 from transformers import AutoImageProcessor, AutoModel
 import faiss
@@ -71,15 +73,20 @@ def search_callback():
 def set_found_objects(objects):
     st.session_state.objects_found = objects
 
-def get_object_info(ind:int):
-    ind = st.session_state.objects_found.index[ind]
-    row = st.session_state.objects_found.loc[ind]
-    image_path = os.path.join("data","train", str(row.object_id), str(row.img_name))
-    image = Image.open(image_path)
-    name = str(row.name)
-    desc = str(row.description)
+def get_object_info_h5(index: int):
+    with h5py.File('data/dataset.h5', 'r') as f:
+        object_info = f['objects'][index]
 
-    return image,name,  desc
+        image_data = object_info['image']
+        if isinstance(image_data, np.ndarray):
+            image = Image.fromarray(image_data)
+        else:
+            image = Image.open(io.BytesIO(image_data))
+
+        name = object_info['name'].decode()
+        desc = object_info['description'].decode()
+
+        return image, name, desc
 
 @st.cache_data
 def get_topk_objects(top_k:int):
