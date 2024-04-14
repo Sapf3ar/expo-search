@@ -1,0 +1,5 @@
+streamlit
+streamlit-extras
+transformers
+faiss-cpu
+torch
